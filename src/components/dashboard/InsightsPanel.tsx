@@ -34,7 +34,7 @@ export default function InsightsPanel() {
     // Savings rate
     const savingsRate = totalIncome > 0 ? Math.round(((totalIncome - totalExpenses) / totalIncome) * 100) : 0;
 
-    // Avg transaction
+    // Avg transactions
     const avgExpense = expenses.length > 0 ? Math.round(totalExpenses / expenses.length) : 0;
 
     return { topCat, monthComparison, savingsRate, avgExpense };
