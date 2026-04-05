@@ -28,7 +28,7 @@ export default function BalanceChart() {
 
   return (
     <div className="dashboard-card fade-in fade-in-delay-2 p-5 sm:p-6">
-      <div className="flex items-center justify-between mb-6">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-6">
         <div>
           <h3 className="text-base font-semibold text-card-foreground">Balance Trend</h3>
           <p className="text-xs text-muted-foreground mt-0.5">Income vs expenses over time</p>
