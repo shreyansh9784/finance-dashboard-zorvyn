@@ -1,11 +1,10 @@
 import { useMemo } from "react";
 import { useFinance } from "@/context/FinanceContext";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from "recharts";
 import { CATEGORY_COLORS, Category } from "@/data/mockData";
 
 export default function SpendingChart() {
-  const { transactions } = useFinance();
+  const { transactions, totalExpenses } = useFinance();
 
   const data = useMemo(() => {
     const map: Record<string, number> = {};
@@ -13,20 +12,21 @@ export default function SpendingChart() {
       map[t.category] = (map[t.category] || 0) + t.amount;
     });
     return Object.entries(map)
-      .map(([name, value]) => ({ name, value }))
+      .map(([name, value]) => ({ name, value, pct: totalExpenses > 0 ? Math.round((value / totalExpenses) * 100) : 0 }))
       .sort((a, b) => b.value - a.value);
-  }, [transactions]);
+  }, [transactions, totalExpenses]);
 
   return (
-    <Card className="fade-in">
-      <CardHeader>
-        <CardTitle className="text-base font-semibold">Spending Breakdown</CardTitle>
-      </CardHeader>
-      <CardContent>
-        <div className="h-[280px] flex items-center">
-          <ResponsiveContainer width="50%" height="100%">
+    <div className="dashboard-card fade-in fade-in-delay-3 p-5 sm:p-6">
+      <div className="mb-4">
+        <h3 className="text-base font-semibold text-card-foreground">Spending Breakdown</h3>
+        <p className="text-xs text-muted-foreground mt-0.5">By category</p>
+      </div>
+      <div className="flex flex-col items-center">
+        <div className="h-[180px] w-full max-w-[200px]">
+          <ResponsiveContainer width="100%" height="100%">
             <PieChart>
-              <Pie data={data} dataKey="value" nameKey="name" cx="50%" cy="50%" innerRadius={50} outerRadius={90} paddingAngle={2}>
+              <Pie data={data} dataKey="value" nameKey="name" cx="50%" cy="50%" innerRadius={55} outerRadius={85} paddingAngle={3} cornerRadius={4}>
                 {data.map(d => (
                   <Cell key={d.name} fill={CATEGORY_COLORS[d.name as Category] || "#888"} />
                 ))}
@@ -35,24 +35,30 @@ export default function SpendingChart() {
                 contentStyle={{
                   backgroundColor: "hsl(var(--card))",
                   border: "1px solid hsl(var(--border))",
-                  borderRadius: "8px",
+                  borderRadius: "10px",
                   color: "hsl(var(--card-foreground))",
+                  fontSize: "13px",
+                  boxShadow: "0 4px 12px rgba(0,0,0,0.1)",
                 }}
                 formatter={(value: number) => [`$${value}`, ""]}
               />
             </PieChart>
           </ResponsiveContainer>
-          <div className="flex-1 space-y-2 pl-2">
-            {data.map(d => (
-              <div key={d.name} className="flex items-center gap-2 text-sm">
-                <div className="w-3 h-3 rounded-full flex-shrink-0" style={{ backgroundColor: CATEGORY_COLORS[d.name as Category] }} />
-                <span className="text-muted-foreground flex-1 truncate">{d.name}</span>
-                <span className="font-medium">${d.value}</span>
-              </div>
-            ))}
-          </div>
         </div>
-      </CardContent>
-    </Card>
+        <div className="w-full space-y-2 mt-4">
+          {data.slice(0, 5).map(d => (
+            <div key={d.name} className="flex items-center gap-3 group">
+              <div className="w-2.5 h-2.5 rounded-full flex-shrink-0" style={{ backgroundColor: CATEGORY_COLORS[d.name as Category] }} />
+              <span className="text-sm text-muted-foreground flex-1 truncate group-hover:text-card-foreground transition-colors">{d.name}</span>
+              <span className="text-xs text-muted-foreground">{d.pct}%</span>
+              <span className="text-sm font-semibold tabular-nums">${d.value}</span>
+            </div>
+          ))}
+          {data.length > 5 && (
+            <p className="text-xs text-muted-foreground text-center pt-1">+{data.length - 5} more categories</p>
+          )}
+        </div>
+      </div>
+    </div>
   );
 }
