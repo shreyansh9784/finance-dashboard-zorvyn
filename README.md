@@ -2,6 +2,9 @@
 
 A modern finance dashboard built using React, Tailwind CSS, and Recharts.
 
+## Live Demo
+👉 https://finance-dashboard-zorvyn-eight.vercel.app
+
 ## Features
 - Summary cards (Balance, Income, Expenses)
 - Transactions table with filtering and search
